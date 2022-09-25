@@ -11,11 +11,9 @@ export interface IPet {
 
 export interface IUser {
   name: string;
-  //   email: string;
+  email: string;
   password: string;
-  //   pet: IPet[];
-  //   createdAt: Date;
-  //   updatedAt: Date;
+  pet: IPet[];
 }
 
 export interface IUserModel extends IUser, Document {}
@@ -23,14 +21,13 @@ export interface IUserModel extends IUser, Document {}
 const UserSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
-    //  email: { type: String, required: true },
+    email: { type: String, required: true },
     password: { type: String, required: true },
-    //  pet: { type: Array, required: true },
-    //  createdAt: { type: Date, required: true },
-    //  updatedAt: { type: Date, required: true },
+    pet: { type: Array, required: true },
   },
   {
     versionKey: false,
+    timestamps: { createdAt: true, updatedAt: true },
   }
 );
 

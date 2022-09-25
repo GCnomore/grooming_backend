@@ -11,8 +11,6 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
     email,
     password,
     pet,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   });
 
   return user
@@ -22,7 +20,7 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getUser = (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.params.userId;
+  const userId = req.body.userId;
 
   return User.findById(userId)
     .then((user) =>
@@ -36,15 +34,13 @@ const getUser = (req: Request, res: Response, next: NextFunction) => {
 const updateUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, password, pet } = req.body;
   const userId = req.params.userId;
-  console.log("userId", userId);
+
   return User.findById(userId).then((user) => {
-    console.log("user", user);
     if (user) {
       user.set({
-        ...user,
-        //   name: name ? name : user.name,
-        password: password ? password : user.password,
-        //   pet: pet ? pet : user.pet,
+        name: name ?? user.name,
+        password: password ?? user.password,
+        pet: pet ?? user.pet,
       });
 
       return user

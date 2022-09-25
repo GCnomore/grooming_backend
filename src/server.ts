@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import { config } from "./config/config";
 import Logging from "./library/Logging";
 import userRoutes from "./routes/User";
+import clientRoutes from "./routes/Client";
+import appointmentRoutes from "./routes/Appointment";
 
 const router = express();
 
@@ -38,6 +40,7 @@ const startServer = () => {
   router.use(express.urlencoded({ extended: true }));
   router.use(express.json());
 
+  // API Rules
   router.use((req, res, next) => {
     res.set("Access-Control-Allow-Origin", "*");
     res.set(
@@ -54,7 +57,9 @@ const startServer = () => {
   });
 
   //* Routes
-  router.use("/user", userRoutes);
+  router.use("/api/user", userRoutes);
+  router.use("/api/client", clientRoutes);
+  router.use("/api/appointment", appointmentRoutes);
 
   //* Healthcheck
   router.get("/ping", (req, res, next) =>
