@@ -1,11 +1,19 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import User from "../model/User";
+import Logging from "../library/Logging";
+import User, { IUser } from "../model/User";
+import {
+  create,
+  deleteById,
+  findByEmail,
+  findById,
+  update,
+} from "../services/User";
 
-const createUser = (req: Request, res: Response, next: NextFunction) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
   const { name, email, password, pet } = req.body;
 
-  const user = new User({
+  const newUser = new User({
     _id: new mongoose.Types.ObjectId(),
     name,
     email,
@@ -13,56 +21,68 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
     pet,
   });
 
-  return user
-    .save()
-    .then((user) => res.status(201).json({ user }))
-    .catch((error) => res.status(500).json({ error }));
+  const user = await findByEmail(email);
+  if (user) {
+    return res.status(409).json({ message: "User already exists" });
+  } else {
+    const _newUser = await create(newUser);
+    if (!_newUser) {
+      return res.status(201).json({ user });
+    } else {
+      return res.status(500);
+    }
+  }
 };
 
-const getUser = (req: Request, res: Response, next: NextFunction) => {
+const getUser = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.body.userId;
 
-  return User.findById(userId)
-    .then((user) =>
-      user
-        ? res.status(200).json({ user })
-        : res.status(404).json({ message: "Not found" })
-    )
-    .catch((error) => res.status(500).json({ error }));
+  const user = await findById(userId);
+
+  if (user) {
+    return res.status(200).json({ user });
+  } else {
+    return res.status(404).json({ message: "Not found" });
+  }
 };
 
-const updateUser = (req: Request, res: Response, next: NextFunction) => {
+const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   const { name, password, pet } = req.body;
   const userId = req.params.userId;
 
-  return User.findById(userId).then((user) => {
-    if (user) {
-      user.set({
-        name: name ?? user.name,
-        password: password ?? user.password,
-        pet: pet ?? user.pet,
-      });
+  const user = await findById(userId);
+  if (!user) {
+    Logging.error("User doesn't exists");
+    res.status(404).json({ message: "Not found" });
+  } else {
+    const updatedUser: IUser = {
+      email: user.email,
+      name: name ?? user.name,
+      password: password ?? user.password,
+      pet: pet ?? user.pet,
+    };
 
-      return user
-        .save()
-        .then((user) => res.status(201).json({ user }))
-        .catch((error) => res.status(500).json({ error }));
-    } else {
-      res.status(404).json({ message: "Not found" });
+    try {
+      await update(user, updatedUser);
+      return res.status(201);
+    } catch (error) {
+      Logging.error(`Update user error: ${error}`);
+      return res.status(500).json({ error });
     }
-  });
+  }
 };
 
-const deleteUser = (req: Request, res: Response, next: NextFunction) => {
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.body.userId;
 
-  return User.findByIdAndDelete(userId)
-    .then((user) =>
-      user
-        ? res.status(200).json({ message: "User deleted" })
-        : res.status(404).json({ message: "Not found" })
-    )
-    .catch((error) => res.status(500).json({ error }));
+  try {
+    await deleteById(userId);
+    Logging.warn(`User deleted: ${userId}`);
+    return res.status(200).json({ message: "User deleted" });
+  } catch (error) {
+    Logging.error(`Delete user error: ${error}`);
+    return res.status(500).json({ error });
+  }
 };
 
 export default { createUser, getUser, updateUser, deleteUser };
