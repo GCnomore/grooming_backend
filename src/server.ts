@@ -7,7 +7,7 @@ import userRoutes from "./routes/User";
 import clientRoutes from "./routes/Client";
 import appointmentRoutes from "./routes/Appointment";
 
-const router = express();
+const app = express();
 
 mongoose
   .connect(config.mongo.url, { retryWrites: true, w: "majority" })
@@ -21,7 +21,7 @@ mongoose
 
 //* Only start the server if Mongo Connects
 const startServer = () => {
-  router.use((req, res, next) => {
+  app.use((req, res, next) => {
     //* Log the Request
     Logging.info(
       `Incoming -> Method: [${req.method}] - Url: [${req.url}] - IP: [${req.socket.remoteAddress}]`
@@ -37,11 +37,11 @@ const startServer = () => {
     next();
   });
 
-  router.use(express.urlencoded({ extended: true }));
-  router.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json());
 
   // API Rules
-  router.use((req, res, next) => {
+  app.use((req, res, next) => {
     res.set("Access-Control-Allow-Origin", "*");
     res.set(
       "Access-Control-Allow-Headers",
@@ -57,24 +57,24 @@ const startServer = () => {
   });
 
   //* Routes
-  router.use("/api/user", userRoutes);
-  router.use("/api/client", clientRoutes);
-  router.use("/api/appointment", appointmentRoutes);
+  app.use("/api/user", userRoutes);
+  app.use("/api/client", clientRoutes);
+  app.use("/api/appointment", appointmentRoutes);
 
   //* Healthcheck
-  router.get("/ping", (req, res, next) =>
+  app.get("/ping", (req, res, next) =>
     res.status(200).json({ message: "pong" })
   );
 
   //* Error handling
-  router.use((req, res, next) => {
+  app.use((req, res, next) => {
     const error = new Error("not found");
     Logging.error(error);
 
-    return res.status(404).json({ message: error.message });
+    return res.status(404).json({ message: error.message, data: req.body });
   });
 
-  http.createServer(router).listen(config.server.port, () =>
+  http.createServer(app).listen(config.server.port, () =>
     Logging.info(`
       $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
       Server is running on port ${config.server.port}

@@ -14,6 +14,16 @@ export interface IClient {
   password: string;
   phone: string;
   contactName: string;
+  hours: {
+    mon: string;
+    tue: string;
+    wed: string;
+    thur: string;
+    fri: string;
+    sat: string;
+    sun: string;
+  };
+  holidays: string[];
   website?: string;
   petLimit: {
     all: boolean;
@@ -38,6 +48,16 @@ const ClientSchema: Schema = new Schema(
     password: { type: String, required: true },
     phone: { type: String, required: true },
     contactName: { type: String, required: true },
+    hours: {
+      mon: { type: String, required: true },
+      tue: { type: String, required: true },
+      wed: { type: String, required: true },
+      thur: { type: String, required: true },
+      fri: { type: String, required: true },
+      sat: { type: String, required: true },
+      sun: { type: String, required: true },
+    },
+    holidays: [{ type: String, required: true }],
     website: { type: String },
     petLimit: {
       all: { type: Boolean, required: true, default: false },
