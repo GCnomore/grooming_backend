@@ -2,10 +2,11 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IPet {
   type: string;
-  breed: string;
   name: string;
-  age: number;
-  weight?: number;
+  breed: string;
+  age: string;
+  weight: string;
+  size: string;
   preferredServices: object[];
 }
 

@@ -22,6 +22,7 @@
   "homepage": "https://github.com/GCnomore/grooming_backend#readme",
   "dependencies": {
     "chalk": "^4.1.2",
+    "cryptr": "^6.0.3",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "jsonwebtoken": "^8.5.1",
@@ -29,6 +30,7 @@
     "mongoose": "^6.6.1"
   },
   "devDependencies": {
+    "@types/cryptr": "^4.0.1",
     "@types/express": "^4.17.14",
     "@types/jsonwebtoken": "^8.5.9",
     "nodemon": "^2.0.20",

@@ -25,6 +25,8 @@ export interface IClient {
   };
   holidays: string[];
   website?: string;
+  lat: string;
+  lng: string;
   petLimit: {
     all: boolean;
     limit: number;
@@ -59,6 +61,8 @@ const ClientSchema: Schema = new Schema(
     },
     holidays: [{ type: String, required: true }],
     website: { type: String },
+    lat: { type: String, required: true },
+    lng: { type: String, required: true },
     petLimit: {
       all: { type: Boolean, required: true, default: false },
       limit: { type: Number, required: true },
